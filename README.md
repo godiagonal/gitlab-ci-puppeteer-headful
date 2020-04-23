@@ -16,7 +16,7 @@ stages:
 
 test:
   stage: test
-  image: gitlab-ci-puppeteer-headful:latest
+  image: samujoha/gitlab-ci-puppeteer-headful:latest
   script:
     - Xvfb -ac :99 -screen 0 1280x1024x16 > /dev/null 2>&1 & # Start virtual display
     - npm test # Your test command(s)
