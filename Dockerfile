@@ -1,13 +1,8 @@
-FROM node:12.10.0
+FROM node:lts
 
-LABEL "com.github.actions.name"="Puppeteer Headful"
-LABEL "com.github.actions.description"="A GitHub Action / Docker image for Puppeteer, the Headful Chrome Node API"
-LABEL "com.github.actions.icon"="layout"
-LABEL "com.github.actions.color"="blue"
-
-LABEL "repository"="https://github.com/mujo-code/puppeteer-headful"
-LABEL "homepage"="https://github.com/mujo-code/puppeteer-headful"
-LABEL "maintainer"="Jacob Lowe"
+LABEL "repository"="https://github.com/godiagonal/gitlab-ci-puppeteer-headful.git"
+LABEL "homepage"="https://github.com/godiagonal/gitlab-ci-puppeteer-headful.git"
+LABEL "maintainer"="Samuel Johansson"
 
 RUN  apt-get update \
      # See https://crbug.com/795759
@@ -21,10 +16,6 @@ RUN  apt-get update \
      && apt-get install -y google-chrome-stable --no-install-recommends \
      && rm -rf /var/lib/apt/lists/*
 
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV DISPLAY :99
 
 COPY README.md /
-
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]

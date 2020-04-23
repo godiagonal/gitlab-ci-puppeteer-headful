@@ -1,47 +1,31 @@
-# Puppeteer Headful
-
-[Github Action](https://github.com/features/actions) for [Puppeteer](https://github.com/GoogleChrome/puppeteer) that can be ran "headful" or not headless.
-
-> Versioning of this container is based on the version of NodeJS in the container
+# GitLab CI Puppeteer Headful
+GitLab CI compatible adaption of [Puppeteer Headful for GitHub Actions](https://github.com/mujo-code/puppeteer-headful).
 
 ## Purpose
-
-This container is available to Github Action because there is some situations ( mostly testing [Chrome Extensions](https://pptr.dev/#?product=Puppeteer&version=v1.18.1&show=api-working-with-chrome-extensions) ) where you can not run Puppeteer in headless mode.
+Makes it possible to run Puppeteer in headful mode in GitLab CI using Docker executor.
 
 ## Usage
-
-This installs Puppeteer ontop of a [NodeJS](https://nodejs.org) container so you have access to run [npm](https://www.npmjs.com) scripts using args. For this hook we hyjack the entrypoint of the [Dockerfile](https://docs.docker.com/engine/reference/builder/) so we can startup [Xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) before your testing starts.
+This installs Puppeteer ontop of a [NodeJS](https://nodejs.org) container so you have access to run [npm](https://www.npmjs.com) scripts. The container comes with [Xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) which you need to start manually before your Puppeteer scripts run.
 
 ```yaml
-name: CI
-on: push
-jobs:
-  installDependencies:
-    name: Install Dependencies
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Install Dependencies
-      uses: actions/npm@master
-      env:
-        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
-      with:
-        args: install
-    - name: Test Code
-      uses: mujo-code/puppeteer-headful@master
-      env:
-        CI: 'true'
-      with:
-        args: npm test
+variables:
+  CI: "true"
+
+stages:
+  - test
+
+test:
+  state: test
+  image: gitlab-ci-puppeteer-headful:latest
+  script:
+    - Xvfb -ac :99 -screen 0 1280x1024x16 > /dev/null 2>&1 & # Start virtual display
+    - npm test # Your test command(s)
 ```
 
-> Note: You will need to let Puppeteer know not to download Chromium. By setting the env of your install task to PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = 'true' so it does not install conflicting versions of Chromium.
-
-Then you will need to change the way you launch Puppeteer. We export out a nifty ENV variable `PUPPETEER_EXEC_PATH` that you set at your `executablePath`. This should be undefined locally so it should function perfectly fine locally and on the action.
+You will also need to make sure Puppeteer is launched in headless mode.
 
 ```javascript
 browser = await puppeteer.launch({
-  executablePath: process.env.PUPPETEER_EXEC_PATH, // set by docker container
   headless: false,
   ...
 });
