@@ -22,7 +22,7 @@ test:
     - npm test # Your test command(s)
 ```
 
-You will also need to make sure Puppeteer is launched in headless mode.
+You will also need to make sure Puppeteer is launched in headful mode.
 
 ```javascript
 browser = await puppeteer.launch({
